@@ -1,3 +1,5 @@
+package ch02
+
 import scala.annotation.tailrec
 
 object Fib {

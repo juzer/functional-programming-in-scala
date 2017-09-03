@@ -1,3 +1,5 @@
+package ch02
+
 import org.scalatest.{FunSuite, Matchers}
 
 class FibTest extends FunSuite with Matchers {
