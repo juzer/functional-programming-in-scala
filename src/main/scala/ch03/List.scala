@@ -53,4 +53,32 @@ object List {
     case Cons(x, Nil) => Nil
     case Cons(x, xs) => append(List(x), init(xs))
   }
+
+  def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = as match {
+    case Nil => z
+    case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+  }
+
+  def length[A](list: List[A]): Int = foldRight(list, 0)((_, acc) => 1 + acc)
+
+  def foldLeft[A, B](as: List[A], z: B)(f: (B, A) => B): B = as match {
+    case Nil => z
+    case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
+  }
+
+  def sumL(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _)
+
+  def productL(ds: List[Double]): Double = foldLeft(ds, 1.0)(_ * _)
+
+  def lengthL[A](list: List[A]): Int = foldLeft(list, 0)((acc, _) => 1 + acc)
+
+  def reverse[A](list: List[A]): List[A] = foldLeft(list, List[A]())((acc, a) => Cons(a, acc))
+
+  def trickyFoldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = foldLeft(as, z)((b, a) => f(a, b))
+
+  def appendR[A](listA: List[A], listB: List[A]): List[A] = foldRight(listA, listB)((a, b) => Cons(a, b))
+
+  def appendL[A](listA: List[A], listB: List[A]): List[A] = foldLeft(reverse(listA), listB)((a, b) => Cons(b, a))
+
+  def unzip[A](list: List[List[A]]): List[A] = foldLeft(list, List[A]())((a: List[A], b: List[A]) => append(a, b))
 }
