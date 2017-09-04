@@ -99,4 +99,32 @@ class ListTest extends FunSuite with Matchers {
   test("should unzip list") {
     assert(List.unzip(List(List(1, 2), List(3, 4, 5), List(6))) == List(1, 2, 3, 4, 5, 6))
   }
+
+  test("should increment every element") {
+    assert(List.incr(List(1, 2, 3, 4, 5, 5)) == List(2, 3, 4, 5, 6, 6))
+  }
+
+  test("should stringify every element") {
+    assert(List.stringify(List(1.9, 2.91, 3.01)) == List("1.9", "2.91", "3.01"))
+  }
+
+  test("should map every element") {
+    assert(List.map(List(1.9, 2.91, 3.01))(a => a.toInt) == List(1, 2, 3))
+  }
+
+  test("should filter out all odd elements") {
+    assert(List.filter(List(1, 1, 4, 3, 4, 5))(_ % 2 == 1) == List(4, 4))
+  }
+
+  test("should flat map all elements") {
+    assert(List.flatMap(List(1, 2, 3))(i => List(i, i)) == List(1, 1, 2, 2, 3, 3))
+  }
+
+  test("should add all elements of both lists") {
+    assert(List.add(List(1, 2, 3), List(4, 5, 6)) == List(5, 7, 9))
+  }
+
+  test("should add all elements of both lists using zipWith") {
+    assert(List.zipWith(List(1, 2, 3), List(4, 5, 6))(_ + _) == List(5, 7, 9))
+  }
 }

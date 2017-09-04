@@ -81,4 +81,31 @@ object List {
   def appendL[A](listA: List[A], listB: List[A]): List[A] = foldLeft(reverse(listA), listB)((a, b) => Cons(b, a))
 
   def unzip[A](list: List[List[A]]): List[A] = foldLeft(list, List[A]())((a: List[A], b: List[A]) => append(a, b))
+
+  def incr(list: List[Int]) = reverse(foldLeft(list, List[Int]())((a, b) => Cons(b + 1, a)))
+
+  def stringify(list: List[Double]) = reverse(trickyFoldRight(list, List[String]())((a, b) => Cons(a.toString(), b)))
+
+  def map[A, B](as: List[A])(f: A => B): List[B] = reverse(foldLeft(as, List[B]())((a, b) => Cons(f(b), a)))
+
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    reverse(foldLeft(as, List[A]())((a, b) => if (f(b)) a else Cons(b, a)))
+
+  def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
+    reverse(foldLeft(as, List[B]())((a, b) => append(f(b), a)))
+
+  def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] =
+    flatMap(l)(a => if (f(a)) List(a) else Nil)
+
+  def add(listA: List[Int], listB: List[Int]): List[Int] = (listA, listB) match {
+    case (_, Nil) => Nil
+    case (Nil, _) => Nil
+    case (Cons(x, xs), Cons(y, ys)) => Cons(x + y, add(xs, ys))
+  }
+
+  def zipWith[A](listA: List[A], listB: List[A])(f: (A, A) => A): List[A] = (listA, listB) match {
+    case (_, Nil) => Nil
+    case (Nil, _) => Nil
+    case (Cons(x, xs), Cons(y, ys)) => Cons(f(x, y), zipWith(xs, ys)(f))
+  }
 }
