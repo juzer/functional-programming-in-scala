@@ -97,7 +97,7 @@ class ListTest extends FunSuite with Matchers {
   }
 
   test("should unzip list") {
-    assert(List.unzip(List(List(1, 2), List(3, 4, 5), List(6))) == List(1, 2, 3, 4, 5, 6))
+    assert(List.flatten(List(List(1, 2), List(3, 4, 5), List(6))) == List(1, 2, 3, 4, 5, 6))
   }
 
   test("should increment every element") {

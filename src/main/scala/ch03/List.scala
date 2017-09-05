@@ -49,9 +49,9 @@ object List {
   }
 
   def init[A](list: List[A]): List[A] = list match {
-    case Nil => Nil
-    case Cons(x, Nil) => Nil
+    case Cons(_, Nil) => Nil
     case Cons(x, xs) => append(List(x), init(xs))
+    case _ => Nil
   }
 
   def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = as match {
@@ -80,11 +80,11 @@ object List {
 
   def appendL[A](listA: List[A], listB: List[A]): List[A] = foldLeft(reverse(listA), listB)((a, b) => Cons(b, a))
 
-  def unzip[A](list: List[List[A]]): List[A] = foldLeft(list, List[A]())((a: List[A], b: List[A]) => append(a, b))
+  def flatten[A](list: List[List[A]]): List[A] = foldLeft(list, List[A]())(append)
 
   def incr(list: List[Int]) = reverse(foldLeft(list, List[Int]())((a, b) => Cons(b + 1, a)))
 
-  def stringify(list: List[Double]) = reverse(trickyFoldRight(list, List[String]())((a, b) => Cons(a.toString(), b)))
+  def stringify(list: List[Double]) = reverse(trickyFoldRight(list, List[String]())((a, b) => Cons(a toString, b)))
 
   def map[A, B](as: List[A])(f: A => B): List[B] = reverse(foldLeft(as, List[B]())((a, b) => Cons(f(b), a)))
 
