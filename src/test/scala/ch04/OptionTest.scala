@@ -47,4 +47,8 @@ class OptionTest extends FunSuite with Matchers {
   test("should return None if optional sequence contains None") {
     assert(Option.sequence(List(Some(1), Some(2), None)) == None)
   }
+
+  test("should traverse a list") {
+    assert(Option.traverse(List("1", "2", "3"))(a => Some(a.toInt)) == Some(List(1, 2, 3)))
+  }
 }

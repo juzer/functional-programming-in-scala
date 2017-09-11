@@ -40,9 +40,12 @@ object Option {
       case Some(x) :: xaa => loop(xaa, x :: acc)
       case Nil => Some(acc.reverse)
       case _ => None
-
     }
     loop(a, List())
+  }
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = {
+    sequence(a.map(f))
   }
 }
 
