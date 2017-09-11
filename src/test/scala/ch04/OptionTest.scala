@@ -35,4 +35,8 @@ class OptionTest extends FunSuite with Matchers {
   test("should filter out non-matching value") {
     assert(Some(7).filter(_ == 18) == None)
   }
+
+  test("should map two options") {
+    assert(None.map2(Some(5), Some(9))(_ * _) == Some(45))
+  }
 }
