@@ -28,10 +28,21 @@ sealed trait Option[+A] {
   def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = {
     a.flatMap(xa => b.map(xb => f(xa, xb)))
   }
-
 }
 
 case class Some[+A](get: A) extends Option[A]
 
 case object None extends Option[Nothing]
+
+object Option {
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = {
+    def loop[A](xa: List[Option[A]], acc: List[A]): Option[List[A]] = xa match {
+      case Some(x) :: xaa => loop(xaa, x :: acc)
+      case Nil => Some(acc.reverse)
+      case _ => None
+
+    }
+    loop(a, List())
+  }
+}
 

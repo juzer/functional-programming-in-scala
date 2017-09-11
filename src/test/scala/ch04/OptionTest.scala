@@ -39,4 +39,12 @@ class OptionTest extends FunSuite with Matchers {
   test("should map two options") {
     assert(None.map2(Some(5), Some(9))(_ * _) == Some(45))
   }
+
+  test("should convert optional sequence") {
+    assert(Option.sequence(List(Some(1), Some(2), Some(3))) == Some(List(1, 2, 3)))
+  }
+
+  test("should return None if optional sequence contains None") {
+    assert(Option.sequence(List(Some(1), Some(2), None)) == None)
+  }
 }
