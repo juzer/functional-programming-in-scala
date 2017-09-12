@@ -41,11 +41,18 @@ object Option {
       case Nil => Some(acc.reverse)
       case _ => None
     }
+
     loop(a, List())
   }
 
-  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = {
-    sequence(a.map(f))
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a flatMap (aa => b map (bb => f(aa, bb)))
+
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = as match {
+    case a :: as => map2(f(a), traverse(as)(f))(_ :: _)
+    case Nil => Some(Nil)
   }
+
+  def sequence2[A](as: List[Option[A]]): Option[List[A]] = traverse(as)(b => b)
 }
 

@@ -51,4 +51,8 @@ class OptionTest extends FunSuite with Matchers {
   test("should traverse a list") {
     assert(Option.traverse(List("1", "2", "3"))(a => Some(a.toInt)) == Some(List(1, 2, 3)))
   }
+
+  test("should convert optional sequence is sense of traverse") {
+    assert(Option.sequence2(List(Some(1), Some(2), Some(3))) == Some(List(1, 2, 3)))
+  }
 }
