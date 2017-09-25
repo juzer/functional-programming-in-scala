@@ -79,4 +79,33 @@ class StreamTest extends FunSuite with Matchers {
   test("should flat map stream") {
     assert(Stream(Stream(1, 2, 3), Stream(4), Stream(5, 6)).flatMap(a => a.map(_ * 2)).toList() == List(2, 4, 6, 8, 10, 12))
   }
+
+  test("should create constant stream") {
+    assert(Stream.constant("g").take(3).toList() == List("g", "g", "g"))
+  }
+
+  test("should generate consecutive integers") {
+    assert(Stream.from(5).take(5).toList() == List(5, 6, 7, 8, 9))
+  }
+
+  test("should generate fibonacci sequence") {
+    assert(Stream.fibs().take(7).toList() == List(0, 1, 1, 2, 3, 5, 8))
+  }
+
+  test("should generate ones with unfold") {
+    assert(Stream.onesUF().take(5).toList() == List(1, 1, 1, 1, 1))
+  }
+
+  test("should generate constant with unfold") {
+    assert(Stream.constantUF("a").take(5).toList() == List("a", "a", "a", "a", "a"))
+  }
+
+  test("should generate consecutive integers with unfold") {
+    assert(Stream.fromUF(5).take(5).toList() == List(5, 6, 7, 8, 9))
+  }
+
+  test("should generate fibonacci sequence with unfold") {
+    assert(Stream.fibsUF().take(7).toList() == List(0, 1, 1, 2, 3, 5, 8))
+  }
+
 }
