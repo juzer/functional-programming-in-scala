@@ -22,31 +22,47 @@ trait Stream[+A] {
   //  @annotation.tailrec
   def toList(): List[A] = this match {
     case Empty => List.empty
-    case Cons(h, t) => h.apply() :: t.apply().toList()
+    case Cons(h, t) => h() :: t().toList()
   }
 
   def take(n: Int): Stream[A] = this match {
-    case Cons(h, t) if n > 0 => Cons(h, () => t.apply().take(n - 1))
+    case Cons(h, t) if n > 0 => Cons(h, () => t().take(n - 1))
     case _ => Empty
   }
 
   def drop(n: Int): Stream[A] = this match {
-    case Cons(_, t) if n > 0 => t.apply().drop(n - 1)
+    case Cons(_, t) if n > 0 => t().drop(n - 1)
     case Cons(h, t) if n <= 0 => Cons(h, t)
     case Empty => Empty
   }
 
   def takeWhile(p: A => Boolean): Stream[A] = this match {
-    case Cons(h, t) if p(h.apply()) => Cons(h, () => t.apply().takeWhile(p))
+    case Cons(h, t) if p(h()) => Cons(h, () => t().takeWhile(p))
     case _ => Empty
   }
 
-  def forAll(p: A => Boolean): Boolean = ???
+  def forAll(p: A => Boolean): Boolean = this match {
+    case Empty => false
+    case _ => foldRight(true)((a, b) => p(a) && b)
+  }
 
-  def headOption: Option[A] = ???
+  def takeWhileFR(p: A => Boolean): Stream[A] = foldRight(empty[A])((a, b) => {
+    if (p(a)) cons(a, b)
+    else Empty
+  })
 
-  // 5.7 map, filter, append, flatmap using foldRight. Part of the exercise is
-  // writing your own function signatures.
+  def headOption: Option[A] = foldRight(Option.empty[A])((a, _) => Some(a))
+
+  def map[B](f: A => B): Stream[B] = foldRight(empty[B])((a, b) => cons(f(a), b))
+
+  def filter(f: A => Boolean): Stream[A] = foldRight(empty[A])((a, b) => {
+    if (f(a)) cons(a, b)
+    else b
+  })
+
+  def append[B >: A](s: => Stream[B]): Stream[B] = foldRight(s)((a, b) => cons(a, b))
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] = foldRight(empty[B])((a, b) => f(a).append(b))
 
   def startsWith[B](s: Stream[B]): Boolean = ???
 }

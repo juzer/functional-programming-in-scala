@@ -35,4 +35,48 @@ class StreamTest extends FunSuite with Matchers {
   test("should return empty stream on taking while elements of empty stream") {
     assert(Stream().takeWhile(_ => true) == Empty)
   }
+
+  test("should return true if all elements conform predicate") {
+    assert(Stream(4, 2, 8, 12, 4).forAll(_ % 2 == 0) == true)
+  }
+
+  test("should return false if any of the elements does not conform predicate") {
+    assert(Stream(4, 2, 8, 7, 4).forAll(_ % 2 == 0) == false)
+  }
+
+  test("should return false when forAll is called on empty stream") {
+    assert(Stream().forAll(_ => true) == false)
+  }
+
+  test("should take elements while condition is satisfied (Fold Right)") {
+    assert(Stream(4, 2, 8, 3, 5).takeWhileFR(_ % 2 == 0).toList() == List(4, 2, 8))
+  }
+
+  test("should return empty stream on taking while elements of empty stream (Fold Right)") {
+    assert(Stream().takeWhileFR(_ => true) == Empty)
+  }
+
+  test("should return non-empty optional on non-empty stream") {
+    assert(Stream(1, 2, 3).headOption == Option(1))
+  }
+
+  test("should return empty optional on empty stream") {
+    assert(Stream().headOption == Option.empty)
+  }
+
+  test("should map stream") {
+    assert(Stream(1, 2, 3, 4).map(_ * 2).toList() == List(2, 4, 6, 8))
+  }
+
+  test("should filter stream") {
+    assert(Stream(3, 2, 4, 5, 6).filter(_ % 2 == 0).toList() == List(2, 4, 6))
+  }
+
+  test("should append stream to stream") {
+    assert(Stream(1, 2, 3, 4).append(Stream(5)).toList() == List(1, 2, 3, 4, 5))
+  }
+
+  test("should flat map stream") {
+    assert(Stream(Stream(1, 2, 3), Stream(4), Stream(5, 6)).flatMap(a => a.map(_ * 2)).toList() == List(2, 4, 6, 8, 10, 12))
+  }
 }
