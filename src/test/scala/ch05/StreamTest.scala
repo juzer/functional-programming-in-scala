@@ -108,4 +108,32 @@ class StreamTest extends FunSuite with Matchers {
     assert(Stream.fibsUF().take(7).toList() == List(0, 1, 1, 2, 3, 5, 8))
   }
 
+  test("should map stream with unfold") {
+    assert(Stream(1, 2, 3, 4).mapUF(_ * 2).toList() == List(2, 4, 6, 8))
+  }
+
+  test("should take first n elements with unfold") {
+    assert(Stream(1, 2, 3, 4, 5).takeUF(3).toList() == List(1, 2, 3))
+  }
+
+  test("should return empty stream on taking elements of empty stream with unfold") {
+    assert(Stream().takeUF(3) == Empty)
+  }
+
+  test("should take elements while condition is satisfied with unfold") {
+    assert(Stream(4, 2, 8, 3, 5).takeWhileUF(_ % 2 == 0).toList() == List(4, 2, 8))
+  }
+
+  test("should return empty stream on taking while elements of empty stream with unfold") {
+    assert(Stream().takeWhileUF(_ => true) == Empty)
+  }
+
+  test("should zip two streams") {
+    assert(Stream(4, 2, 8, 3, 5).zipWith(Stream(3, 3, 3))((_, _)).toList() == List((4, 3), (2, 3), (8, 3)))
+  }
+
+  test("should zip all from two streams") {
+    assert(Stream(4, 2, 8, 3, 5).zipAll(Stream("a", "b", "c")).toList() == List((Some(4), Some("a")), (Some(2), Some("b")), (Some(8), Some("c")), (Some(3), None), (Some(5), None)))
+  }
+
 }
