@@ -144,4 +144,8 @@ class StreamTest extends FunSuite with Matchers {
     assert(Stream(1, 2, 3, 4, 5).startsWith(Stream(2, 3)) == false)
   }
 
+  test("should return tails") {
+    assert(Stream(1, 2, 3).tails.map(_.toList()).toList() == List(List(1, 2, 3), List(2, 3), List(3), List()))
+  }
+
 }
