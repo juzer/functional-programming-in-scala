@@ -136,4 +136,12 @@ class StreamTest extends FunSuite with Matchers {
     assert(Stream(4, 2, 8, 3, 5).zipAll(Stream("a", "b", "c")).toList() == List((Some(4), Some("a")), (Some(2), Some("b")), (Some(8), Some("c")), (Some(3), None), (Some(5), None)))
   }
 
+  test("should return true if stream starts with given stream") {
+    assert(Stream(1, 2, 3, 4, 5).startsWith(Stream(1, 2, 3)) == true)
+  }
+
+  test("should return false if stream does not start with given stream") {
+    assert(Stream(1, 2, 3, 4, 5).startsWith(Stream(2, 3)) == false)
+  }
+
 }
