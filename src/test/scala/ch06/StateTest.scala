@@ -42,5 +42,31 @@ class StateTest extends FunSuite with Matchers {
     assert(ints.takeWhile(_.isInstanceOf[Int]) == ints)
   }
 
+  test("should return a double by map") {
+    val dbl = RNG.doubleByMap(Simple(42))._1
+    assert(0.0 <= dbl && dbl < 1.0)
+  }
+
+  test("should return an integer and a double with map") {
+    val ((intgr, dbl), _) = RNG.randIntDouble(Simple(42))
+    assert(intgr.isInstanceOf[Int])
+    assert(dbl.isInstanceOf[Double])
+    assert(isInRange(dbl))
+  }
+
+  test("should return a double and an integer with map") {
+    val ((dbl, intgr), _) = RNG.randDoubleInt(Simple(42))
+    assert(intgr.isInstanceOf[Int])
+    assert(dbl.isInstanceOf[Double])
+    assert(isInRange(dbl))
+  }
+
+  test("should generate a list of integers with sequence") {
+    val ints = RNG.intsWithSequence(5)
+    val list = ints(Simple(42))._1
+    assert(list.length == 5)
+    assert(list.takeWhile(_.isInstanceOf[Int]) == list)
+  }
+
   private def isInRange(dbl1: Double) = 0 <= dbl1 && dbl1 < 1
 }
