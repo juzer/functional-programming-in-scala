@@ -3,13 +3,18 @@ import scala.io.StdIn
 
 object Solution {
 
-  type Layers = List[List[Int]]
-  def Layers() = List[List[Int]]()
+  type Layer = List[(Int, Int)]
+  def Layer() = List[(Int, Int)]()
+
+  type Layers = List[Layer]
+  def Layers() = List[Layer]()
+
 
   def loadArray(rows: Int, cols: Int): Array[Array[Int]] = {
     val arr = Array.ofDim[Int](rows, cols)
     for (i <- 0 to rows - 1) {
-      arr(i) = StdIn.readLine().split(" ").map(_.toInt)
+//      arr(i) = StdIn.readLine().split(" ").map(_.toInt)
+      arr(i) = List.range(1, cols + 1).map(_ + (i * cols)).mkString(" ").split(" ").map(_.toInt)
     }
     arr
   }
@@ -31,40 +36,49 @@ object Solution {
     end ::: beginning
   }
 
-  def peel(array: Array[Array[Int]], cols: Int, list: Layers): (Layers, Array[Array[Int]]) = {
-    var layer = List[Int]()
-    layer = layer ++ array(0)
-    layer = layer ++ array.map {
-      _ (cols - 1)
-    }.splitAt(1)._2.splitAt(array.length - 2)._1
-    layer = layer ++ array(array.length - 1).reverse
-    layer = layer ++ array.map {
-      _ (0)
-    }.splitAt(1)._2.splitAt(array.length - 2)._1.reverse
-
-    var tempArray = array.splitAt(1)._2.splitAt(array.length - 2)._1
-    for (i <- 0 to tempArray.length - 1) {
-      tempArray(i) = tempArray.last.splitAt(1)._2.splitAt(cols - 2)._1
+  def peel(array: Array[Array[Int]], level: Int, rows: Int, cols: Int, list: Layers): Layers = level match {
+    case _ if ((level < rows / 2) && (level < cols / 2)) => {
+      var layer = Layer()
+      for (j <- level to (cols - level - 1)) {
+        layer = layer.+:((level, j))
+      }
+      for (i <- (level + 1) to (rows - level - 1)) {
+        layer = layer.+:((i, rows - level - 1))
+      }
+      for (j <- level to (cols - level - 2)) {
+        layer = layer.+:((rows - level - 1, cols - j - 2))
+      }
+      for (i <- level to (rows - level - 3)) {
+        layer = layer.+:((rows - i  - 2, level))
+      }
+      peel(array, level + 1, rows, cols, list.::(layer.reverse))
     }
-//    if (list.head == Nil) (Layers(layer), tempArray)
-//    else
-    ((list :: layer).asInstanceOf[Layers], tempArray)
-  }
-
-  def loadIntoLists(array: Array[Array[Int]], cols: Int, list: Layers): Layers = cols match {
-    case x if x > 1 => {
-      val (newList, newArr) = peel(array, cols, list)
-      loadIntoLists(newArr, cols - 2, newList)
+    case _ if ((level == rows / 2) && (level == cols / 2) && (level % 2 == 1)) => {
+      var layer = Layer()
+      list.::(layer.::((level, level)))
     }
-    case x if x == 1 => {
-      list :: List(array(0)(0))
+    case _ if ((level == rows / 2) && (level == cols / 2)) => {
       list
     }
-    case _ => {
-      if (list.head == Nil) {
-        list.splitAt(1)._2
-      } else list
+    case _ if (level == rows / 2) => {
+      var layer = Layer()
+      for(j <- level to (cols - level -1)) {
+        layer = layer.+:((level, j))
+      }
+      list.::(layer.reverse)
     }
+    case _ if (level == cols / 2) => {
+      var layer = Layer()
+      for(i <- level to (rows - level - 1)) {
+        layer = layer.+:((i, level))
+      }
+      list.::(layer.reverse)
+    }
+    case _ => list
+  }
+
+  def loadIntoLists(array: Array[Array[Int]], cols: Int, list: Layers): Layers = {
+      peel(array, 0, array.length, cols, list)
   }
 
   def rotate(list: Layers, rows: Int, cols: Int, rotations: Int): Layers = {
@@ -74,44 +88,33 @@ object Solution {
     @tailrec
     def go(list: Layers, acc: Layers): Layers = list match {
       case h :: t => {
-        go(t, (acc :: rollList(h, r)).asInstanceOf[Layers])
+        go(t, rollList(h, r) :: acc)
       }
       case _ => acc
     }
-    go(list, Layers())
-  }
-
-  def fillArray(list: Layers, minRow: Int, maxRow: Int, minCol: Int, maxCol: Int, array: Array[Array[Int]]): Array[Array[Int]] = list match {
-    case h :: t => {
-      val temp = h.splitAt(maxCol - minCol)
-      array(minRow) = temp._1.toArray
-      var internal = temp._2
-      for (i <- 1 to maxRow - 1) {
-        array(i)(0) = internal.last
-        internal = internal.dropRight(1)
-        array(i)(maxCol) = internal(0)
-        internal = internal.drop(1)
-      }
-      array(maxRow) = internal.reverse.toArray
-      fillArray(t, minRow + 1, maxRow - 1, minCol + 1, maxCol - 1, array)
-    }
-    case _ => array
-  }
-
-  def toArray(list: Layers, rows: Int, cols: Int): Array[Array[Int]] = {
-    val array = Array.ofDim[Int](rows, cols)
-    fillArray(list, 0, rows -1, 0, cols - 1, array)
+    go(list, Layers()).reverse
   }
 
   def main(args: Array[String]) {
-    val firstLine = StdIn.readLine().split(" ")
+    //     val firstLine = StdIn.readLine().split(" ")
+    val firstLine = "4 4 1".split(" ")
     val rows = firstLine(0).toInt
     val cols = firstLine(1).toInt
     val rotations = firstLine(2).toInt
 
     val array = loadArray(rows, cols)
     val list = loadIntoLists(array, cols, Layers())
+    val rotated = rotate(list, rows, cols, rotations)
 
-    printArray(toArray(rotate(list, rows, cols, rotations), rows, cols))
+    val tuples = list.zip(rotated).map(i => i._1.zip(i._2))
+
+    var newArray = Array.ofDim[Int](rows, cols)
+    tuples.foreach(layer => {
+      layer.foreach(item => {
+        newArray(item._1._1)(item._1._2) = array(item._2._1)(item._2._2)
+      })
+    })
+
+    printArray(newArray)
   }
 }
