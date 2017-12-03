@@ -37,15 +37,16 @@ object Solution {
     case _ => {}
   }
 
-  def swap(tree: Option[Tree[Int]], lvl: Int, swpAt: Int): Option[Tree[Int]] = tree match {
+  def swap(tree: Option[Tree[Int]], lvl: Int, swpAt: Int, k: Int): Option[Tree[Int]] = tree match {
     case Some(Branch(v: Int, l, r)) => {
       if (v == -1) {
         return tree
       }
       if (lvl == swpAt) {
-        Some(Branch(v, r, l))
+//        println("Swapping " + v + " at " + lvl)
+        Some(Branch(v, swap(r, lvl + 1, swpAt + k, k), swap(l, lvl + 1, swpAt + k, k)))
       } else {
-        Some(Branch(v, swap(l, lvl + 1, swpAt), swap(r, lvl + 1, swpAt)))
+        Some(Branch(v, swap(l, lvl + 1, swpAt, k), swap(r, lvl + 1, swpAt, k)))
       }
     }
     case Some(Leaf(v)) => {
@@ -54,10 +55,6 @@ object Solution {
     case None => {
       None
     }
-  }
-
-  def swapBranches(t: Branch[Int]): Tree[Int] = {
-    Branch(t.value, t.right, t.left)
   }
 
   def readInput(): (Int, Array[String], Int, Array[Int]) = {
@@ -77,14 +74,14 @@ object Solution {
 
   def main(args: Array[String]) {
     val (n, input, t, ks) = readInput()
+//        val input: Array[String] = "11\n2 3\n4 -1\n5 -1\n6 -1\n7 8\n-1 9\n-1 -1\n10 11\n-1 -1\n-1 -1\n-1 -1\n2\n2\n4".split("\n")
+//        val n = input(0).toInt
+//        val t = input(n + 1)
+//        val ks = input.splitAt(n + 2)._2.map(_.toInt)
     val tree = buildNode(1, n, input)
-    //    val input: Array[String] = "5\n2 3\n-1 4\n-1 5\n-1 -1\n-1 -1\n1\n2".split("\n")
-    //    val n = input(0).toInt
-    //    val t = input(n + 1)
-    //    val ks = input.splitAt(n + 2)._2.map(_.toInt)
     // TODO swap on k*2...
-    ks.foldRight(tree)((k, t) => {
-      val newT = swap(Some(t), 1, k)
+    ks.foldLeft(tree)((t, k) => {
+      val newT = swap(Some(t), 1, k, k)
       inorderPrint(newT)
       println()
       newT.get
